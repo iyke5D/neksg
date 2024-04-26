@@ -34,7 +34,7 @@ create_account() {
     limit_conn_single=$5    # Get the connection limit from the fifth argument
     
     # Add logic to create the VPN account
-    echo "$username:$password:$duration:$limit_conn_single:ACTIVE" >> auth.txt
+    echo "$username:$password:$duration:$limit_conn_single:online" >> auth.txt
 }
 
 # Command to block a VPN account
@@ -42,7 +42,7 @@ block_account() {
     username=$2             # Get the username from the second argument
     
     # Add logic to block the VPN account
-    sed -i "/^$username/s/:ACTIVE$/:BLOCKED/" auth.txt
+    sed -i "/^$username/s/:online$/:offline/" auth.txt
 }
 
 # Command to unblock a VPN account
@@ -50,7 +50,7 @@ unblock_account() {
     username=$2             # Get the username from the second argument
     
     # Add logic to unblock the VPN account
-    sed -i "/^$username/s/:BLOCKED$/:ACTIVE/" auth.txt
+    sed -i "/^$username/s/:offline$/:online/" auth.txt
 }
 
 # Command to renew a VPN account
@@ -73,13 +73,19 @@ remove_account() {
 # Command to remove all user accounts with 0 days left
 remove_expired_accounts() {
     # Add logic to remove accounts with 0 days left
-    sed -i '/:0:ACTIVE$/d' auth.txt
+    sed -i '/:0:online$/d' auth.txt
 }
 
 # Command to display account details
 display_account_details() {
     # Add logic to display account details
-    cat auth.txt
+    while IFS=: read -r username _ status; do
+        if [[ $status == "online" ]]; then
+            echo -e "${GREEN}$username${NC}"
+        elif [[ $status == "offline" ]]; then
+            echo -e "${RED}$username${NC}"
+        fi
+    done < auth.txt
 }
 
 # Parse command from arguments
@@ -93,4 +99,3 @@ case $1 in
     display) display_account_details;;
     display_server) display_server_info;;
 esac
-
