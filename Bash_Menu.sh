@@ -10,9 +10,9 @@ NC='\033[0m' # No Color
 
 banner() {
     clear
-    figlet -k  kwadze | lolcat
+    figlet -k  RICKYS | lolcat
     echo -e "${ORANGE}  LinkLayer VPN Account Manager UI${NC}"
-    echo -e "${ORANGE}    version: 1.0.0 | by: @kwadeous${NC}"
+    echo -e "${ORANGE}   version: 1.0.1 | by: @kwadeous${NC}"
 }
 
 # Function to display server information
@@ -221,10 +221,17 @@ remove_expired_accounts() {
     read -p "Press Enter to continue..."
 }
 
+#Function to display banner at the centre
+banner_centre() {
+    clear
+    figlet -c -k  RICKYS | lolcat
+    echo -e "${ORANGE}                       LinkLayer VPN Account Manager UI${NC}"
+    echo -e "${ORANGE}                        version: 1.0.1 | by: @kwadeous${NC}"
+}
 # Function to display user account details
 display_account_details() {
-    banner
-    echo -e "${ORANGE}VPN Account Details${NC}"
+    banner_centre
+    echo -e "${ORANGE}                             User Account Details${NC}"
     echo -e "${BLUE}=====================================================================${NC}"
     echo -e "${GREEN}Username        | Expiry Date | Days Left |      limit       | Status${NC}"
     echo -e "${BLUE}=====================================================================${NC}"
@@ -255,12 +262,14 @@ display_account_details() {
 # Function to display details of a single account
 display_single_account() {
     banner
-    echo -e "${ORANGE}Newly Created Account Details${NC}"
-    echo -e "${CYAN}Username${NC}": "${GREEN}$1${NC}"
-    echo -e "${CYAN}Password${NC}": "${GREEN}$2${NC}"
-    echo -e "${CYAN}Duration${NC}": "${GREEN}$3 days${NC}"
-    echo -e "${CYAN}Limit   ${NC}": "${GREEN}$4${NC}"
-    echo -e "${CYAN}IP      ${NC}": "${GREEN}${NC}"
+    echo -e "${ORANGE}     New User Account Details${NC}"
+    echo -e "${BLUE}===================================${NC}"
+    echo -e "${CYAN}   User Acc Name${NC}": "${GREEN}$1${NC}"
+    echo -e "${CYAN}   User Password${NC}": "${GREEN}$2${NC}"
+    echo -e "${CYAN}   User Duration${NC}": "${GREEN}$3 days${NC}"
+    echo -e "${CYAN}   User Limit   ${NC}": "${GREEN}$4${NC}"
+    echo -e "${CYAN}   Host/IP      ${NC}": "${GREEN}${NC}"
+    echo -e "${BLUE}===================================${NC}"
     read -p "Press Enter to continue..."
 }
 
@@ -299,9 +308,9 @@ while true; do
     echo -e "${CYAN}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~${NC}"
     echo -e "${BLUE}  ${NC} ${GREEN}[1] Display Server Info. ${NC}"
     echo -e "${BLUE}  ${NC} ${BLUE}[2] Create Account ${NC}"
-    echo -e "${BLUE}  ${NC} ${ORANGE}[3] Block Account ${NC}"
-    echo -e "${BLUE}  ${NC} ${BLUE}[4] Unblock Account  ${NC}"
-    echo -e "${BLUE}  ${NC} ${GREEN}[5] Renew Account ${NC}"
+    echo -e "${BLUE}  ${NC} ${RED}[3] Block Account ${NC}"
+    echo -e "${BLUE}  ${NC} ${GREEN}[4] Unblock Account  ${NC}"
+    echo -e "${BLUE}  ${NC} ${BLUE}[5] Renew Account ${NC}"
     echo -e "${BLUE}  ${NC} ${RED}[6] Remove Account ${NC}"
     echo -e "${BLUE}  ${NC} ${CYAN}[7] Display Account Details ${NC}"
     echo -e "${BLUE}  ${NC} ${ORANGE}[8] Remove All Expired Accounts ${NC}"
