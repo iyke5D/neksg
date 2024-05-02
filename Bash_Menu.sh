@@ -8,6 +8,8 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+work_dir="/etc/neksg"
+
 banner() {
     clear
     figlet -k  RICKYS | lolcat
@@ -52,7 +54,7 @@ create_account() {
     fi
     
     # Check if the username already exists
-    if grep -q "^$username:" auth.txt; then
+    if grep -q "^$username:" "$work_dir/auth.txt"; then
         echo -e "${RED}Error:${NC} Username already exists."
         read -p "Press Enter to continue..."
         return
@@ -64,6 +66,7 @@ create_account() {
     read -p "Enter user account limit (enter -1 for unlimited): " limit_conn_single
     
     # Execute the auth.sh script to create the VPN account
+    cd $work_dir
     ./auth.sh create "$username" "$password" "$duration" "$limit_conn_single"
     echo -e "${GREEN}Account created successfully.${NC}"
     
@@ -82,18 +85,19 @@ block_account() {
     read -p "Enter username to block: " username
     
     # Check if the username exists
-    if ! grep -q "^$username:" auth.txt; then
+    if ! grep -q "^$username:" "$work_dir/auth.txt"; then
         echo -e "${RED}Error:${NC} Username does not exist."
         read -p "Press Enter to continue..."
         return
     fi
     
     # Execute the auth.sh script to block the VPN account
+    cd $work_dir
     ./auth.sh block "$username"
     echo -e "${GREEN}Account blocked successfully.${NC}"
     
     # Disconnect the user's IP address from accessing the internet via iptables
-    user_ip=$(grep "^$username:" auth.txt | cut -d':' -f6)
+    user_ip=$(grep "^$username:" "$work_dir/auth.txt" | cut -d':' -f6)
     if [ -n "$user_ip" ]; then
         sudo iptables -D INPUT -s "$user_ip" -j ACCEPT
         sudo iptables -A INPUT -s "$user_ip" -j DROP
@@ -114,18 +118,19 @@ unblock_account() {
     read -p "Enter username to unblock: " username
     
     # Check if the username exists
-    if ! grep -q "^$username:" auth.txt; then
+    if ! grep -q "^$username:" "$work_dir/auth.txt"; then
         echo -e "${RED}Error:${NC} Username does not exist."
         read -p "Press Enter to continue..."
         return
     fi
     
     # Execute the auth.sh script to unblock the VPN account
+    cd $work_dir
     ./auth.sh unblock "$username"
     echo -e "${GREEN}Account unblocked successfully.${NC}"
     
     # Re-allow the user's IP address to access the internet via iptables
-    user_ip=$(grep "^$username:" auth.txt | cut -d':' -f6)
+    user_ip=$(grep "^$username:" "$work_dir/auth.txt" | cut -d':' -f6)
     if [ -n "$user_ip" ]; then
         sudo iptables -D INPUT -s "$user_ip" -j DROP
         sudo iptables -A INPUT -s "$user_ip" -j ACCEPT
@@ -146,7 +151,7 @@ renew_account() {
     read -p "Enter username to renew: " username
     
     # Check if the username exists
-    if ! grep -q "^$username:" auth.txt; then
+    if ! grep -q "^$username:" "$work_dir/auth.txt"; then
         echo -e "${RED}Error:${NC} Username does not exist."
         read -p "Press Enter to continue..."
         return
@@ -155,6 +160,7 @@ renew_account() {
     read -p "Enter new duration (in days): " new_duration
     
     # Execute the auth.sh script to renew the VPN account
+    cd $work_dir
     ./auth.sh renew "$username" "$new_duration"
     echo -e "${GREEN}Account renewed successfully.${NC}"
     
@@ -173,19 +179,20 @@ remove_account() {
     read -p "Enter username to remove: " username
     
     # Check if the username exists
-    if ! grep -q "^$username:" auth.txt; then
+    if ! grep -q "^$username:" "$work_dir/auth.txt"; then
         echo -e "${RED}Error:${NC} Username does not exist."
         read -p "Press Enter to continue..."
         return
     fi
     
     # Disconnect the user's IP address from accessing the internet via iptables
-    user_ip=$(grep "^$username:" auth.txt | cut -d':' -f6)
+    user_ip=$(grep "^$username:" "$work_dir/auth.txt" | cut -d':' -f6)
     if [ -n "$user_ip" ]; then
         sudo iptables -D INPUT -s "$user_ip" -j DROP
     fi
     
     # Execute the auth.sh script to remove the VPN account
+    cd $work_dir
     ./auth.sh remove "$username"
     echo -e "${GREEN}Account removed successfully.${NC}"
     
@@ -214,10 +221,10 @@ remove_expired_accounts() {
                 sudo iptables -D INPUT -s "$user_ip" -j DROP
             fi
         fi
-    done < auth.txt
+    done < "$work_dir/auth.txt"
     
-    # Overwrite auth.txt with the filtered accounts
-    mv "$tmp_file" auth.txt
+    # Overwrite "$work_dir/auth.txt" with the filtered accounts
+    mv "$tmp_file" "$work_dir/auth.txt"
     
     echo -e "${GREEN}Expired accounts removed successfully.${NC}"
     read -p "Press Enter to continue..."
@@ -256,7 +263,7 @@ display_account_details() {
         
         # Print details with cyan color
         printf "${CYAN}%-15s | %-11s | %-9s | %-16s | %s${NC}\n" "$username" "$expiry_date" "$days_left" "$limit_conn_single" "$status_color"
-    done < auth.txt 
+    done < "$work_dir/auth.txt" 
     echo -e "${BLUE}=====================================================================${NC}"
     read -p "Press Enter to continue..."
 }
@@ -299,10 +306,10 @@ update_account_status() {
             else
                 echo "$line" >> "$tmp_file"
             fi
-        done < auth.txt
+        done < "$work_dir/auth.txt"
         
-        # Overwrite auth.txt with the filtered accounts
-        mv "$tmp_file" auth.txt
+        # Overwrite "$work_dir/auth.txt" with the filtered accounts
+        mv "$tmp_file" "$work_dir/auth.txt"
         
         sleep 300  # Adjust sleep interval based on your needs (e.g., every 5 minutes)
     done
