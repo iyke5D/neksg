@@ -7,6 +7,8 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+work_dir="/etc/neksg"
+
 # Function to display server information
 display_server_info() {
     clear
@@ -34,7 +36,7 @@ create_account() {
     limit_conn_single=$5    # Get the connection limit from the fifth argument
     
     # Add logic to create the VPN account
-    echo "$username:$password:$duration:$limit_conn_single:active" >> auth.txt
+    echo "$username:$password:$duration:$limit_conn_single:active" >> "$work_dir/auth.txt"
 }
 
 # Command to block a VPN account
@@ -42,7 +44,7 @@ block_account() {
     username=$2             # Get the username from the second argument
     
     # Add logic to block the VPN account
-    sed -i "/^$username/s/:active$/:blocked/" auth.txt
+    sed -i "/^$username/s/:active$/:blocked/" "$work_dir/auth.txt"
 }
 
 # Command to unblock a VPN account
@@ -50,7 +52,7 @@ unblock_account() {
     username=$2             # Get the username from the second argument
     
     # Add logic to unblock the VPN account
-    sed -i "/^$username/s/:blocked$/:active/" auth.txt
+    sed -i "/^$username/s/:blocked$/:active/" "$work_dir/auth.txt"
 }
 
 # Command to renew a VPN account
@@ -59,7 +61,7 @@ renew_account() {
     new_duration=$3         # Get the new duration from the third argument
     
     # Add logic to renew the VPN account
-    sed -i "/^$username/s/:[0-9]*:/:$new_duration:/" auth.txt
+    sed -i "/^$username/s/:[0-9]*:/:$new_duration:/" "$work_dir/auth.txt"
 }
 
 # Command to remove a VPN account
@@ -67,13 +69,13 @@ remove_account() {
     username=$2             # Get the username from the second argument
     
     # Add logic to remove the VPN account
-    sed -i "/^$username/d" auth.txt
+    sed -i "/^$username/d" "$work_dir/auth.txt"
 }
 
 # Command to remove all user accounts with 0 days left
 remove_expired_accounts() {
     # Add logic to remove accounts with 0 days left
-    sed -i '/:0:active$/d' auth.txt
+    sed -i '/:0:active$/d' "$work_dir/auth.txt"
 }
 
 # Command to display account details
@@ -85,7 +87,7 @@ display_account_details() {
         elif [[ $status == "blocked" ]]; then
             echo -e "${RED}$username${NC}"
         fi
-    done < auth.txt
+    done < "$work_dir/auth.txt"
 }
 
 # Parse command from arguments
