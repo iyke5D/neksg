@@ -12,9 +12,7 @@ banner() {
     clear
     figlet -k  RICKYS | lolcat
     echo -e "${ORANGE}  LinkLayer VPN Account Manager UI${NC}"
-    echo -e "${ORANGE}  version: 1.0.1  |  by: @kwadeous${NC}"
-    echo -e "${ORANGE}  Host/IP:$(hostname -I | cut -d' ' -f1)${NC}"
-    echo -e "${ORANGE}  ISP: $(wget -qO- ipinfo.io/org)${NC}"
+    echo -e "${ORANGE}   version: 1.0.1 | by: @kwadeous${NC}"
 }
 
 # Function to display server information
@@ -25,7 +23,7 @@ display_server_info() {
     echo -e "${GREEN}RAM:${NC} $(free -h | awk '/Mem/{print $2}')"
     
     # Retrieve ISP information using curl
-    isp=$(wget -qO- ipinfo.io/org)
+    isp=$(curl -s ifconfig.me/isp)
     
     if [ -n "$isp" ]; then
         echo -e "${GREEN}ISP:${NC} $isp"
@@ -60,7 +58,7 @@ create_account() {
     
     read -p "Enter password: " password
     echo # for a new line
-    read -p "Enter duration(in days): " duration
+    read -p "Enter duration (in days): " duration
     read -p "Enter user account limit (enter -1 for unlimited): " limit_conn_single
     
     # Execute the auth.sh script to create the VPN account
@@ -222,20 +220,20 @@ remove_expired_accounts() {
     echo -e "${GREEN}Expired accounts removed successfully.${NC}"
     read -p "Press Enter to continue..."
 }
-# Function to display centre banner
+
+#Function to display banner at the centre
 banner_centre() {
     clear
-    figlet -c -k RICKYS | lolcat
+    figlet -c -k  RICKYS | lolcat
     echo -e "${ORANGE}                       LinkLayer VPN Account Manager UI${NC}"
     echo -e "${ORANGE}                        version: 1.0.1 | by: @kwadeous${NC}"
 }
-
 # Function to display user account details
 display_account_details() {
     banner_centre
-    echo -e "${ORANGE}                            User Account Details${NC}"
+    echo -e "${ORANGE}                             User Account Details${NC}"
     echo -e "${BLUE}=====================================================================${NC}"
-    echo -e "${GREEN}Username        | Expiry Date | Days Left |      limit       | Status${NC}"
+    echo -e "${GREEN}Username        | Expiry Date | Days Left |   limit  | Status${NC}"
     echo -e "${BLUE}=====================================================================${NC}"
     while IFS= read -r line; do
         username=$(echo "$line" | cut -d':' -f1)
@@ -248,36 +246,30 @@ display_account_details() {
         # Determine color based on status
         if [ "$status" = "active" ]; then
             status_color=$(echo -e "${GREEN}$status${NC}")  # Green for active
-        elif [ "$status" = "blocked" ]; then
+        elif [ "$status" = "expired" ]; then
             status_color=$(echo -e "${RED}$status${NC}")  # Red for blocked
         else
             status_color="$status"  # Default color
         fi
         
         # Print details with cyan color
-        printf "${CYAN}%-15s | %-11s | %-9s | %-16s | %s${NC}\n" "$username" "$expiry_date" "$days_left" "$limit_conn_single" "$status_color"
+        printf "${CYAN}%-15s | %-11s | %-9s | %-8s | %s${NC}\n" "$username" "$expiry_date" "$days_left" "$limit_conn_single" "$status_color"
     done < auth.txt 
     echo -e "${BLUE}=====================================================================${NC}"
     read -p "Press Enter to continue..."
 }
-# New account details banner
-banner_new_acc() {
-    clear
-    figlet -k  RICKYS | lolcat
-    echo -e "${ORANGE}  LinkLayer VPN Account Manager UI${NC}"
-    echo -e "${ORANGE}   version: 1.0.1 | by: @kwadeous${NC}"
-}
+
 # Function to display details of a single account
 display_single_account() {
-    banner_new_acc
-    echo -e "${ORANGE}      New User Account Details${NC}"
-    echo -e "${BLUE}========================================${NC}"
-    echo -e "${CYAN}  Username${NC}": "${GREEN}$1${NC}"
-    echo -e "${CYAN}  Password${NC}": "${GREEN}$2${NC}"
-    echo -e "${CYAN}  Duration${NC}": "${GREEN}$3 days${NC}"
-    echo -e "${CYAN}  Limit   ${NC}": "${GREEN}$4${NC}"
-    echo -e "${CYAN}  Host/IP ${NC}": "${GREEN}$5$(hostname -I | cut -d' ' -f1)${NC}"
-    echo -e "${BLUE}========================================${NC}"
+    banner
+    echo -e "${ORANGE}     New User Account Details${NC}"
+    echo -e "${BLUE}===================================${NC}"
+    echo -e "${CYAN}   User Acc Name${NC}": "${GREEN}$1${NC}"
+    echo -e "${CYAN}   User Password${NC}": "${GREEN}$2${NC}"
+    echo -e "${CYAN}   User Duration${NC}": "${GREEN}$3 days${NC}"
+    echo -e "${CYAN}   User Limit   ${NC}": "${GREEN}$4${NC}"
+    echo -e "${CYAN}   Host/IP      ${NC}": "${GREEN}${NC}"
+    echo -e "${BLUE}===================================${NC}"
     read -p "Press Enter to continue..."
 }
 
@@ -316,9 +308,9 @@ while true; do
     echo -e "${CYAN}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~${NC}"
     echo -e "${BLUE}  ${NC} ${GREEN}[1] Display Server Info. ${NC}"
     echo -e "${BLUE}  ${NC} ${BLUE}[2] Create Account ${NC}"
-    echo -e "${BLUE}  ${NC} ${ORANGE}[3] Block Account ${NC}"
-    echo -e "${BLUE}  ${NC} ${BLUE}[4] Unblock Account  ${NC}"
-    echo -e "${BLUE}  ${NC} ${GREEN}[5] Renew Account ${NC}"
+    echo -e "${BLUE}  ${NC} ${RED}[3] Block Account ${NC}"
+    echo -e "${BLUE}  ${NC} ${GREEN}[4] Unblock Account  ${NC}"
+    echo -e "${BLUE}  ${NC} ${BLUE}[5] Renew Account ${NC}"
     echo -e "${BLUE}  ${NC} ${RED}[6] Remove Account ${NC}"
     echo -e "${BLUE}  ${NC} ${CYAN}[7] Display Account Details ${NC}"
     echo -e "${BLUE}  ${NC} ${ORANGE}[8] Remove All Expired Accounts ${NC}"
