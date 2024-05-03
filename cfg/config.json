@@ -1,5 +1,7 @@
 {
-  "auth":"system",
+  "auth":"binary",
+  "file":"/etc/neksg/auth.txt",
+  "executable":"/etc/neksg/auth.sh",
   "banner":"LinkLayerVPN Manager Script by @kwadze",
   "limit_conn_single":-1,
   "limit_conn_request":-1,
@@ -63,11 +65,11 @@
 },
      {"type":"udp",
      "cfg":{
-      "listen":":36718","exclude":"53,5300","net":"$netty","cert":"/etc/neksg/layers/cfgs/lnklyr.crt","key":"/etc/neksg/layers/cfgs/lnklyr.key","obfs":"NeksGVPNScript","max_conn_client":500000
+      "listen":":36718","exclude":"53,5300","net":"$netty","cert":"/etc/neksg/layers/cfgs/my.crt","key":"/etc/neksg/layers/cfgs/my.key","obfs":"NeksG2k4","max_conn_client":500000
     }
     },
      
-     {"type":"dnstt"
+     {"type":"dnstt",
      "cfg":{
        "Domain":"$domain",
        "Net":"$netty"
