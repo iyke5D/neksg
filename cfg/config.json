@@ -2,7 +2,7 @@
   "auth":"binary",
   "file":"/etc/neksg/auth.txt",
   "executable":"/etc/neksg/auth.sh",
-  "banner":"LinkLayerVPN Manager Script by @kwadze",
+  "banner":"LinkLayerVPN Manager Script by @Kwadeous",
   "limit_conn_single":-1,
   "limit_conn_request":-1,
    "services":[
@@ -43,8 +43,8 @@
           "Response":"HTTP/1.1 206 OK\r\n\r\n"
        },
        "TLS":{
-        "Cert":"/etc/lnklyr/cfg/cert.pem",
-        "Key":"/etc/lnklyr/cfg/key.pem"
+        "Cert":"/etc/neksg/cfg/cert.pem",
+        "Key":"/etc/neksg/cfg/key.pem"
        },
        "Listen":"0.0.0.0:8990"
      }
