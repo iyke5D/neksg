@@ -8,6 +8,12 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+neksg_dir="/etc/neksg"
+
+#change directory to my working directory
+changeDir=$(cd $neksg_dir)
+
+
 banner() {
     clear
     figlet -k  RICKYS | lolcat
@@ -50,6 +56,7 @@ create_account() {
     fi
     
     # Check if the username already exists
+    cd $neksg_dir
     if grep -q "^$username:" auth.txt; then
         echo -e "${RED}Error:${NC} Username already exists."
         read -p "Press Enter to continue..."
@@ -178,7 +185,7 @@ remove_account() {
     fi
     
     # Disconnect the user's IP address from accessing the internet via iptables
-    user_ip=$(grep "^$username:" auth.txt | cut -d':' -f6)
+    user_ip=$(grep "^$username:" /etc/neksg/auth.txt | cut -d':' -f6)
     if [ -n "$user_ip" ]; then
         sudo iptables -D INPUT -s "$user_ip" -j DROP
     fi
@@ -233,7 +240,7 @@ display_account_details() {
     banner_centre
     echo -e "${ORANGE}                             User Account Details${NC}"
     echo -e "${BLUE}=====================================================================${NC}"
-    echo -e "${GREEN}Username        | Expiry Date | Days Left |   limit  | Status${NC}"
+    echo -e "${GREEN}Username        | Expiry Date | Days Left |      limit       | Status${NC}"
     echo -e "${BLUE}=====================================================================${NC}"
     while IFS= read -r line; do
         username=$(echo "$line" | cut -d':' -f1)
@@ -244,16 +251,16 @@ display_account_details() {
         user_ip=$(echo "$line" | cut -d':' -f6)
         
         # Determine color based on status
-        if [ "$status" = "active" ]; then
+        if [ "$status" = "online" ]; then
             status_color=$(echo -e "${GREEN}$status${NC}")  # Green for active
-        elif [ "$status" = "expired" ]; then
+        elif [ "$status" = "offline" ]; then
             status_color=$(echo -e "${RED}$status${NC}")  # Red for blocked
         else
             status_color="$status"  # Default color
         fi
         
         # Print details with cyan color
-        printf "${CYAN}%-15s | %-11s | %-9s | %-8s | %s${NC}\n" "$username" "$expiry_date" "$days_left" "$limit_conn_single" "$status_color"
+        printf "${CYAN}%-15s | %-11s | %-9s | %-16s | %s${NC}\n" "$username" "$expiry_date" "$days_left" "$limit_conn_single" "$status_color"
     done < auth.txt 
     echo -e "${BLUE}=====================================================================${NC}"
     read -p "Press Enter to continue..."
@@ -291,7 +298,7 @@ update_account_status() {
             else
                 echo "$line" >> "$tmp_file"
             fi
-        done < auth.txt
+        done < "$neksg_dir/auth.txt" >/dev/null 2>&1
         
         # Overwrite auth.txt with the filtered accounts
         mv "$tmp_file" auth.txt
